@@ -38,7 +38,7 @@ public class StudentDAO {
             String city = rs.getString("city").trim();
             String country = rs.getString("country").trim();
 
-            Student student = new Student(email, name, birthDate, gender, houseNumber, address, postalCode, city,
+            Student student = new Student(email, name, birthDate, gender, address, houseNumber, postalCode, city,
                     country);
             student.setId(id);
             students.add(student);
@@ -105,36 +105,68 @@ public class StudentDAO {
     }
 
     public ObservableList<String> getWebcastProgress(int studentId, int webcastContentId) throws SQLException {
-        System.out.println("[DEBUG] getWebcastProgress gestart met studentId=" + studentId + " en webcastId=" + webcastContentId);
-    
+        System.out.println(
+                "[DEBUG] getWebcastProgress gestart met studentId=" + studentId + " en webcastId=" + webcastContentId);
+
         databaseConnection.openConnection();
-    
+
         ObservableList<String> progress = FXCollections.observableArrayList();
-    
+
         String selectStmt = """
-            SELECT c.title, wc.percentageWatched
-            FROM WatchedContent wc
-            JOIN Content c ON wc.contentId = c.id
-            JOIN Webcast w ON c.id = w.contentId
-            WHERE wc.studentId = %d AND w.contentId = %d
-        """.formatted(studentId, webcastContentId);
-    
+                    SELECT c.title, wc.percentageWatched
+                    FROM WatchedContent wc
+                    JOIN Content c ON wc.contentId = c.id
+                    JOIN Webcast w ON c.id = w.contentId
+                    WHERE wc.studentId = %d AND w.contentId = %d
+                """.formatted(studentId, webcastContentId);
+
         System.out.println("[DEBUG] Query: " + selectStmt);
         ResultSet rs = databaseConnection.executeSQLSelectStatement(selectStmt);
-    
+
         if (rs == null) {
             System.out.println("[ERROR] ResultSet is null! Mogelijk databasefout.");
             return progress;
         }
-    
+
         while (rs.next()) {
             String title = rs.getString("title").trim();
             double percentageWatched = rs.getDouble("percentageWatched");
             progress.add(title + ": " + String.format("%.2f", percentageWatched) + "% watched");
         }
-    
+
         databaseConnection.closeConnection();
         return progress;
+    }
+
+    // update an existing student in the database
+    public void updateStudent(Student student) {
+        databaseConnection.openConnection();
+
+        StringBuilder updateStmt = new StringBuilder();
+        updateStmt.append("UPDATE Student SET ");
+        updateStmt.append("email = '").append(student.getEmail()).append("', ");
+        updateStmt.append("name = '").append(student.getName()).append("', ");
+        updateStmt.append("birthDate = '").append(student.getBirthDate()).append("', ");
+        updateStmt.append("gender = '").append(student.getGender().toString()).append("', ");
+        updateStmt.append("address = '").append(student.getAddress()).append("', ");
+        updateStmt.append("houseNumber = '").append(student.getHouseNumber()).append("', ");
+        updateStmt.append("postalCode = '").append(student.getPostalCode()).append("', ");
+        updateStmt.append("city = '").append(student.getCity()).append("', ");
+        updateStmt.append("country = '").append(student.getCountry()).append("' ");
+        updateStmt.append("WHERE id = ").append(student.getId());
+
+        databaseConnection.executeSQLUpdateStatement(updateStmt.toString());
+        databaseConnection.closeConnection();
+    }
+
+    // delete a student from the database by id
+    public void deleteStudent(int id) {
+        databaseConnection.openConnection();
+
+        String deleteStmt = "DELETE FROM Student WHERE id = " + id;
+        databaseConnection.executeSQLUpdateStatement(deleteStmt);
+
+        databaseConnection.closeConnection();
     }
 
 }

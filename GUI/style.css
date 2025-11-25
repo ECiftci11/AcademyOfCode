@@ -1,0 +1,174 @@
+/* ===== Algemene achtergrond ===== */
+.root {
+    -fx-background-color: #001839; /* zelfde als je VBox nu */
+}
+
+/* ===== Menubar basis ===== */
+.menu-bar {
+    -fx-background-color: #E1CBB4;      /* beige balk */
+    -fx-padding: 0 10 0 10;
+    -fx-border-color: transparent transparent #001839 transparent;
+    -fx-border-width: 0 0 2 0;         /* subtiel lijntje onder */
+}
+
+/* Tekst in de menubalk */
+.menu-bar .label {
+    -fx-text-fill: #001839;            /* donkerblauw tekst */
+    -fx-font-weight: bold;
+}
+
+/* ===== Hover / actief op hoofdmenu-items ===== */
+.menu-bar .menu:hover,
+.menu-bar .menu:showing {
+    -fx-background-color: #001839;     /* donkerblauw blokje */
+}
+
+.menu-bar .menu:hover .label,
+.menu-bar .menu:showing .label {
+    -fx-text-fill: #E1CBB4;            /* beige tekst bij hover */
+}
+
+/* ===== Dropdown menu (contextmenu) ===== */
+.context-menu {
+    -fx-background-color: #001839;     /* donkerblauwe dropdown */
+    -fx-padding: 4 0 4 0;
+}
+
+/* Tekst in dropdown items */
+.menu-item .label {
+    -fx-text-fill: #E1CBB4;
+}
+
+/* Hover/selected in dropdown */
+.menu-item:focused {
+    -fx-background-color: #163265;     /* iets lichtere blauw als hover */
+}
+
+.menu-item:focused .label {
+    -fx-text-fill: #E1CBB4;
+}
+
+
+/* ===== Labels ===== */
+.label {
+    -fx-text-fill: #E1CBB4;            /* beige tekst */
+}
+
+/* ===== Buttons ===== */
+.button {
+    -fx-background-color: #E1CBB4;     /* beige knop */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst */
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #163265;     /* iets lichtere blauw als hover */
+    -fx-text-fill: #E1CBB4;            /* beige tekst bij hover */
+}
+
+/* ========== CHOICEBOX (gesloten weergave) ========== */
+
+/* Achtergrond van de gesloten ChoiceBox */
+.choice-box {
+    -fx-background-color: #E1CBB4;   /* beige */
+}
+
+/* Tekst in de gesloten ChoiceBox */
+.choice-box > .label {
+    -fx-text-fill: #001839;          /* donkerblauw */
+    -fx-font-weight: bold;
+}
+
+
+/* ========== DROPDOWN (lijst van items) ========== */
+
+/* Normale dropdown items */
+.choice-box .list-view .list-cell {
+    -fx-background-color: #E1CBB4;   /* beige */
+    -fx-text-fill: #001839;          /* donkerblauw */
+}
+
+/* Hover over dropdown item */
+.choice-box .list-view .list-cell:hover {
+    -fx-background-color: #163265;   /* lichtere blauw */
+    -fx-text-fill: #E1CBB4;          /* beige */
+}
+
+/* Geselecteerde dropdown item */
+.choice-box .list-view .list-cell:selected {
+    -fx-background-color: #001839;   /* donkerblauw */
+    -fx-text-fill: #E1CBB4;          /* beige */
+}
+
+
+/* ===== TextField ===== */
+.text-field {
+    -fx-background-color: #E1CBB4;     /* beige achtergrond */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst */
+}
+
+.text-field:focused {
+    -fx-border-color: #163265;         /* iets lichtere blauw als focus */
+    -fx-border-width: 2;
+}
+
+/* ===== DatePicker ===== */
+.date-picker {
+    -fx-background-color: #E1CBB4;     /* beige achtergrond */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst */
+    -fx-font-weight: bold;
+}
+
+.date-picker .arrow-button {
+    -fx-background-color: #001839;     /* donkerblauwe knop */
+}
+
+.date-picker .arrow-button .arrow {
+    -fx-background-color: #E1CBB4;     /* beige pijltje */
+}
+
+.date-picker .text-field {
+    -fx-background-color: #E1CBB4;     /* beige achtergrond */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst */
+}
+
+.date-picker-popup {
+    -fx-background-color: #001839;     /* donkerblauwe popup */
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-background-color: #163265;     /* iets lichtere blauw */
+    -fx-text-fill: #E1CBB4;            /* beige tekst */
+}
+
+.date-picker-popup .calendar-day-cell {
+    -fx-background-color: #E1CBB4;     /* beige dagen */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst */
+}
+
+.date-picker-popup .calendar-day-cell:hover,
+.date-picker-popup .calendar-day-cell:selected {
+    -fx-background-color: #163265;     /* iets lichtere blauw als hover/select */
+    -fx-text-fill: #E1CBB4;            /* beige tekst */
+}
+
+/* ===== Listview ===== */
+.list-view {
+    -fx-background-color: #E1CBB4;     /* beige achtergrond */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst */
+}
+
+.list-cell {
+    -fx-background-color: #E1CBB4;     /* beige achtergrond dropdown */
+    -fx-text-fill: #001839;            /* donkerblauwe tekst dropdown */
+}
+
+.list-cell:hover {
+    -fx-background-color: #163265;     /* iets lichtere blauw als hover */
+    -fx-text-fill: #E1CBB4;            /* beige tekst bij hover */
+}
+
+.list-cell:selected {
+    -fx-background-color: #001839;     /* donkerblauw als geselecteerd */
+    -fx-text-fill: #E1CBB4;            /* beige tekst bij geselecteerd */
+}

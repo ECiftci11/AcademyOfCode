@@ -14,11 +14,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import Database.EnrollmentDAO;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -33,6 +38,7 @@ public class homePageController implements Initializable {
     private final EnrollmentDAO enrollmentDAO = new EnrollmentDAO(new DatabaseConnection());
 
     private final ObservableList<Student> studentList = FXCollections.observableArrayList();
+    private Student selectedStudentForEdit;
 
     public void setMainController(mainController mainController) {
         this.mainController = mainController;
@@ -87,6 +93,11 @@ public class homePageController implements Initializable {
     @FXML
     private void goToAddEnrollment(ActionEvent event) {
         mainController.switchScene("addEnrollment.fxml");
+    }
+
+    @FXML
+    private void editStudent(ActionEvent event) {
+        mainController.switchScene("editStudent.fxml");
     }
 
     // Velden uit addStudent.fxml
@@ -289,6 +300,146 @@ public class homePageController implements Initializable {
             clearForm();
         } catch (Exception e) {
             showAlert("Fout bij toevoegen student: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void onStudentClicked(javafx.scene.input.MouseEvent event) {
+        if (event.getClickCount() == 2) { // dubbelklik
+            Student selected = allStudentList.getSelectionModel().getSelectedItem();
+            if (selected == null)
+                return;
+
+            openEditStudentPage(selected);
+        }
+    }
+
+    private void openEditStudentPage(Student selected) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/GUI/views/editStudent.fxml"));
+            Parent root = loader.load();
+
+            // zelfde controllerklasse:
+            homePageController controller = loader.getController();
+            controller.setMainController(this.mainController); // zodat menu-navigatie blijft werken
+            controller.setStudent(selected); // velden vullen
+
+            Stage stage = (Stage) allStudentList.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Fout bij openen edit-scherm: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleSaveEditedStudent(ActionEvent event) {
+        if (selectedStudentForEdit == null) {
+            showAlert("Geen student geselecteerd om te bewerken.");
+            return;
+        }
+
+        String name = nameField.getText();
+        String email = emailField.getText();
+        LocalDate birth = birthDatePicker.getValue();
+        Gender gender = genderBox.getValue();
+        String country = countryField.getText();
+        String city = cityField.getText();
+        String address = addressField.getText();
+        String houseNr = houseNumberField.getText();
+        String postal = postalCodeField.getText();
+
+        if (isEmpty(name) || isEmpty(email) || birth == null || gender == null ||
+                isEmpty(country) || isEmpty(city) || isEmpty(address) || isEmpty(houseNr) || isEmpty(postal)) {
+            showAlert("Alle velden moeten ingevuld zijn.");
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showAlert("Ongeldig e-mailadres");
+            return;
+        }
+
+        if (!isValidBirthDate(birth)) {
+            showAlert("Geboortedatum mag niet in de toekomst liggen.");
+            return;
+        }
+
+        if (!isValidPostalCode(postal)) {
+            showAlert("Postcode moet 4 cijfers + 2 letters zijn (bijv. 1234AB)");
+            return;
+        }
+
+        // waardes terugschrijven naar de bestaande Student
+        selectedStudentForEdit.setName(name);
+        selectedStudentForEdit.setEmail(email);
+        selectedStudentForEdit.setBirthDate(birth);
+        selectedStudentForEdit.setGender(gender);
+        selectedStudentForEdit.setCountry(country);
+        selectedStudentForEdit.setCity(city);
+        selectedStudentForEdit.setAddress(address);
+        selectedStudentForEdit.setHouseNumber(houseNr);
+        selectedStudentForEdit.setPostalCode(postal);
+
+        try {
+            studentDAO.updateStudent(selectedStudentForEdit); // 👈 nieuwe DAO-methode
+            showConfirmation("Student succesvol bijgewerkt!");
+            mainController.switchScene("manageStudents.fxml");
+        } catch (Exception e) {
+            showAlert("Fout bij bijwerken student: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleDeleteStudent(ActionEvent event) {
+        if (selectedStudentForEdit == null) {
+            showAlert("Geen student geselecteerd om te verwijderen.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Student verwijderen");
+        confirm.setHeaderText("Weet je zeker dat je deze student wilt verwijderen?");
+        confirm.setContentText(selectedStudentForEdit.getName() + " (" + selectedStudentForEdit.getEmail() + ")");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    studentDAO.deleteStudent(selectedStudentForEdit.getId()); // 👈 nieuwe DAO-methode
+                    showConfirmation("Student succesvol verwijderd!");
+                    mainController.switchScene("manageStudents.fxml");
+                } catch (Exception e) {
+                    showAlert("Fout bij verwijderen student: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void setStudent(Student student) {
+        this.selectedStudentForEdit = student;
+
+        if (student != null) {
+            if (nameField != null)
+                nameField.setText(student.getName());
+            if (emailField != null)
+                emailField.setText(student.getEmail());
+            if (birthDatePicker != null)
+                birthDatePicker.setValue(student.getBirthDate());
+            if (genderBox != null)
+                genderBox.setValue(student.getGender());
+            if (countryField != null)
+                countryField.setText(student.getCountry());
+            if (cityField != null)
+                cityField.setText(student.getCity());
+            if (addressField != null)
+                addressField.setText(student.getAddress());
+            if (houseNumberField != null)
+                houseNumberField.setText(student.getHouseNumber());
+            if (postalCodeField != null)
+                postalCodeField.setText(student.getPostalCode());
         }
     }
 
